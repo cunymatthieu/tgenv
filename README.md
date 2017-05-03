@@ -11,19 +11,19 @@ Currently tgenv supports the following OSes
 
 1. Check out tgenv into any path (here is `${HOME}/.tgenv`)
 
-  ```sh
+  ```bash
   $ git clone https://github.com/cunymatthieu/tgenv.git ~/.tgenv
   ```
 
 2. Add `~/.tgenv/bin` to your `$PATH` any way you like
 
-  ```sh
+  ```bash
   $ echo 'export PATH="$HOME/.tgenv/bin:$PATH"' >> ~/.bash_profile
   ```
 
   OR you can make symlinks for `tgenv/bin/*` scripts into a path that is already added to your `$PATH` (e.g. `/usr/local/bin`) `OSX/Linux Only!`
 
-  ```sh
+  ```bash
   $ ln -s ~/.tgenv/bin/* /usr/local/bin
   ``` 
 
@@ -33,13 +33,11 @@ Install a specific version of Terraform
 `latest` is a syntax to install latest version
 `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 
-```sh
+```bash
 $ tgenv install 0.7.0
 $ tgenv install latest
 $ tgenv install latest:^0.8
 ```
-
-If shasum is present in the path, tgenv will verify the download against Hashicorp's published sha256 hash. If [keybase](https://keybase.io/) is available in the path it will also verify the signature for those published hashes using hashicorp's published public key. 
 
 If you use [.terragrunt-version](#terragrunt-version), `tgenv install` (no argument) will install the version written in it.
 
@@ -48,7 +46,7 @@ Switch a version to use
 `latest` is a syntax to use the latest installed version
 `latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
 
-```sh
+```bash
 $ tgenv use 0.7.0
 $ tgenv use latest
 $ tgenv use latest:^0.8
@@ -59,7 +57,7 @@ Uninstall a specific version of Terraform
 `latest` is a syntax to uninstall latest version
 `latest:<regex>` is a syntax to uninstall latest version matching regex (used by grep -e)
 
-```sh
+```bash
 $ tgenv uninstall 0.7.0
 $ tgenv uninstall latest
 $ tgenv uninstall latest:^0.8
@@ -68,7 +66,7 @@ $ tgenv uninstall latest:^0.8
 ### tgenv list
 List installed versions
 
-```sh
+```bash
 % tgenv list
 0.12.15
 0.12.8
@@ -79,7 +77,7 @@ List installed versions
 ### tgenv list-remote
 List installable versions
 
-```sh
+```bash
 % tgenv list-remote
 0.12.15
 0.12.14
@@ -110,7 +108,7 @@ List installable versions
 ## .terragrunt-version
 If you put `.terragrunt-version` file on your project root, tgenv detects it and use the version written in it. If the version is `latest` or `latest:<regex>`, the latest matching version currently installed will be selected.
 
-```sh
+```bash
 $ cat .terragrunt-version
 0.9.9
 
@@ -132,12 +130,12 @@ Terraform v0.10.3
 ```
 
 ## Upgrading
-```sh
+```bash
 $ git --git-dir=~/.tgenv/.git pull
 ```
 
 ## Uninstalling
-```sh
+```bash
 $ rm -rf /some/path/to/tgenv
 ```
 
