@@ -1,5 +1,5 @@
 # tgenv
-[Terraform](https://www.terragrunt.io/) version manager inspired by [tfenv](https://github.com/kamatama41/tgenv)
+[Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tgenv)
 
 
 ## Support
@@ -25,11 +25,11 @@ Currently tgenv supports the following OSes
 
   ```bash
   $ ln -s ~/.tgenv/bin/* /usr/local/bin
-  ``` 
+  ```
 
 ## Usage
 ### tgenv install
-Install a specific version of Terraform  
+Install a specific version of terragrun  
 `latest` is a syntax to install latest version
 `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 
@@ -53,7 +53,7 @@ $ tgenv use latest:^0.8
 ```
 
 ### tgenv uninstall
-Uninstall a specific version of Terraform
+Uninstall a specific version of terragrun
 `latest` is a syntax to uninstall latest version
 `latest:<regex>` is a syntax to uninstall latest version matching regex (used by grep -e)
 
@@ -113,20 +113,20 @@ $ cat .terragrunt-version
 0.9.9
 
 $ terragrunt --version
-Terraform v0.9.9
+terragrun v0.9.9
 
-Your version of Terraform is out of date! The latest version
+Your version of terragrun is out of date! The latest version
 is 0.7.3. You can update by downloading from www.terragrunt.io
 
 $ echo 0.9.9 > .terragrunt-version
 
 $ terragrunt --version
-Terraform v0.7.3
+terragrunt v0.12.15
 
 $ echo latest:^0.10 > .terragrunt-version
 
 $ terragrunt --version
-Terraform v0.10.3
+terragrunt v0.10.3
 ```
 
 ## Upgrading
@@ -142,4 +142,3 @@ $ rm -rf /some/path/to/tgenv
 ## LICENSE
 - [tgenv itself](https://github.com/cunymatthieu/tgenv/blob/master/LICENSE)
 - [tfenv ](https://github.com/kamatama41/tgenv/blob/master/LICENSE) : pkenv mainly uses tfenv's source code
-

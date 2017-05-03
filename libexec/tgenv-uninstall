@@ -41,8 +41,8 @@ version="$(tgenv-list | grep -e "${regex}" | head -n 1)"
 
 dst_path="${TGENV_ROOT}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then 
-  info "Uninstall Terraform v${version}"
+  info "Uninstall Terragrunt v${version}"
   rm -r "${dst_path}"
-  info "\033[0;32mTerraform v${version} is successfully uninstalled\033[0;39m"
+  info "\033[0;32mTerragrunt v${version} is successfully uninstalled\033[0;39m"
 fi
 

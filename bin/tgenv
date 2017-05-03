@@ -24,7 +24,6 @@ if [ -z "${TGENV_ROOT}" ]; then
 else
   TGENV_ROOT="${TGENV_ROOT%/}"
 fi
-echo $TGENV_ROOT
 export TGENV_ROOT
 PATH="${TGENV_ROOT}/libexec:${PATH}"
 export PATH

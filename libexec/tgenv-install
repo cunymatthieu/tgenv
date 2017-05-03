@@ -45,7 +45,7 @@ version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)"
 
 dst_path="${TGENV_ROOT}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then
-  echo "Terraform v${version} is already installed"
+  echo "Terragrunt v${version} is already installed"
   exit 0
 fi
 

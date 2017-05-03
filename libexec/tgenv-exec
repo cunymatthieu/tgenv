@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
-# Summary: Run an executable with the selected Terraform version
+# Summary: Run an executable with the selected Terragrunt version
 #
 # Usage: tgenv exec <command> [arg1 arg2...]
 #
-# Runs an executable by first preparing PATH so that the selected Terraform
+# Runs an executable by first preparing PATH so that the selected Terragrunt
 # version's `bin' directory is at the front.
 #
-# For example, if the currently selected Terraform version is 0.7.0:
+# For example, if the currently selected Terragrunt version is 0.7.0:
 #   tgenv exec plan
 #
 # is equivalent to:
