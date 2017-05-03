@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+function error_and_die() {
+  echo -e "tgenv: ${0}: ${1}" >&2
+  exit 1
+}
+
+[ -n "${TGENV_DEBUG}" ] && set -x
+
+[ ${#} -ne 1 ] && error_and_die "usage: tgenv use <version>"
+
+declare version_requested version regex
+
+version_requested="${1}"
+
+if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
+  version="${version_requested%%\:*}"
+  regex="${version_requested##*\:}"
+elif [[ "${version_requested}" =~ ^latest$ ]]; then
+  version="${version_requested}"
+  regex=""
+else
+  version="${version_requested}"
+  regex="${version_requested}"
+fi
+
+[ -d "${TGENV_ROOT}/versions" ] \
+  || error_and_die "No versions of terragrunt installed. Please install one with: tgenv install"
+
+version="$(\ls "${TGENV_ROOT}/versions" \
+  | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+  | grep -e "${regex}" \
+  | head -n 1
+)"
+
+[ -n "${version}" ] || error_and_die "No installed versions of terragrunt matched '${1}'"
+
+target_path=${TGENV_ROOT}/versions/${version}
+[ -f ${target_path}/terragrunt ] \
+  || error_and_die "Version directory for ${version} is present, but the terragrunt binary is not! Manual intervention required."
+[ -x ${target_path}/terragrunt ] \
+  || error_and_die "Version directory for ${version} is present, but the terragrunt binary is not executable! Manual intervention required. "
+
+echo "${version}" > "${TGENV_ROOT}/version"
+terragrunt --version || error_and_die "'terragrunt --version' failed. Something is seriously wrong"

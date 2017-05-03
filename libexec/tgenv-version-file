@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Usage: tgenv version-file
+# Summary: Detect the file that sets the current tgenv version
+set -e
+[ -n "${TGENV_DEBUG}" ] && set -x
+
+find_local_version_file() {
+  local root="${1}"
+  while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
+    if [ -e "${root}/.terragrunt-version" ]; then
+      echo "${root}/.terragrunt-version"
+      return 0
+    fi
+    [ -n "${root}" ] || break
+    root="${root%/*}"
+  done
+  return 1
+}
+
+find_local_version_file "${TGENV_DIR}" || echo "${TGENV_ROOT}/version"

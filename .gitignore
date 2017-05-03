@@ -1,0 +1,4 @@
+versions/
+version
+.terragrunt-version
+bin/terragrunt-*

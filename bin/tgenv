@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+set -e
+if [ -n "$TGENV_DEBUG" ]; then
+  export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
+  set -x
+fi
+
+# http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+readlink_f() {
+  local target_file=$1
+  local file_name
+
+  while [ "$target_file" != "" ]; do
+    cd $(dirname ${target_file})
+    file_name=$(basename ${target_file})
+    target_file=$(readlink ${file_name})
+  done
+
+  echo $(pwd -P)/${file_name}
+}
+
+if [ -z "${TGENV_ROOT}" ]; then
+  TGENV_ROOT=$(cd $(dirname $(readlink_f $0))/.. && pwd)
+else
+  TGENV_ROOT="${TGENV_ROOT%/}"
+fi
+echo $TGENV_ROOT
+export TGENV_ROOT
+PATH="${TGENV_ROOT}/libexec:${PATH}"
+export PATH
+export TGENV_DIR="${PWD}"
+
+abort() {
+  { if [ "$#" -eq 0 ]; then cat -
+    else echo "tgenv: $*"
+    fi
+  } >&2
+  exit 1
+}
+
+command="$1"
+case "$command" in
+"" )
+  { tgenv---version
+    tgenv-help
+  } | abort
+  ;;
+-v | --version )
+  exec tgenv---version
+  ;;
+-h | --help )
+  exec tgenv-help
+  ;;
+* )
+  command_path="$(command -v "tgenv-${command}" || true)"
+  if [ -z "$command_path" ];then
+    { echo "no such command '$command'"
+      tgenv-help
+    } | abort
+  fi
+  shift 1
+  exec "$command_path" "$@"
+  ;;
+esac
