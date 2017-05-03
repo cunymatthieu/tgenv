@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cunymatthieu/tgenv.svg?branch=master)](https://travis-ci.org/cunymatthieu/tgenv)
+
 # tgenv
 [Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tgenv)
 
