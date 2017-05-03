@@ -31,7 +31,7 @@ Currently tgenv supports the following OSes
 
 ## Usage
 ### tgenv install
-Install a specific version of terragrun  
+Install a specific version of terragrunt  
 `latest` is a syntax to install latest version
 `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 
@@ -115,9 +115,9 @@ $ cat .terragrunt-version
 0.9.9
 
 $ terragrunt --version
-terragrun v0.9.9
+terragrunt version v0.9.9
 
-Your version of terragrun is out of date! The latest version
+Your version of terragrunt is out of date! The latest version
 is 0.7.3. You can update by downloading from www.terragrunt.io
 
 $ echo 0.9.9 > .terragrunt-version
