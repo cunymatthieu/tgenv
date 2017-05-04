@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/cunymatthieu/tgenv.svg?branch=master)](https://travis-ci.org/cunymatthieu/tgenv)
 
 # tgenv
-[Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tgenv)
+[Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tfenv)
 
 
 ## Support
@@ -36,7 +36,7 @@ Install a specific version of terragrunt
 `latest:<regex>` is a syntax to install latest version matching regex (used by grep -e)
 
 ```bash
-$ tgenv install 0.7.0
+$ tgenv install 0.12.12
 $ tgenv install latest
 $ tgenv install latest:^0.8
 ```
