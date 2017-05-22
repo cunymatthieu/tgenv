@@ -38,7 +38,7 @@ Install a specific version of terragrunt
 ```bash
 $ tgenv install 0.12.12
 $ tgenv install latest
-$ tgenv install latest:^0.8
+$ tgenv install latest:^0.9
 ```
 
 If you use [.terragrunt-version](#terragrunt-version), `tgenv install` (no argument) will install the version written in it.
@@ -49,20 +49,20 @@ Switch a version to use
 `latest:<regex>` is a syntax to use latest installed version matching regex (used by grep -e)
 
 ```bash
-$ tgenv use 0.7.0
+$ tgenv use 0.12.1
 $ tgenv use latest
-$ tgenv use latest:^0.8
+$ tgenv use latest:^0.10
 ```
 
 ### tgenv uninstall
-Uninstall a specific version of terragrun
+Uninstall a specific version of terragrunt
 `latest` is a syntax to uninstall latest version
 `latest:<regex>` is a syntax to uninstall latest version matching regex (used by grep -e)
 
 ```bash
-$ tgenv uninstall 0.7.0
+$ tgenv uninstall 0.12.1
 $ tgenv uninstall latest
-$ tgenv uninstall latest:^0.8
+$ tgenv uninstall latest:^0.9
 ```
 
 ### tgenv list
