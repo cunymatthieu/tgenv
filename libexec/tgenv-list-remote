@@ -12,7 +12,7 @@ if [ ${#} -ne 0 ];then
   exit 1
 fi
 
-link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags"
+link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=100"
 print=`curl --tlsv1.2 -sf $link_release`
 
 return_code=$?
