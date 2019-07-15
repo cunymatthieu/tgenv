@@ -12,11 +12,12 @@
 set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 
-version="0.0.2"
+version=$(awk '/^##/{ print $2; exit}' "${TGENV_ROOT}"/CHANGELOG.md)
 git_revision=""
 
 if cd "${BASH_SOURCE%/*}" 2>/dev/null && git remote -v 2>/dev/null | grep -q tgenv; then
   git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
   git_revision="${git_revision#v}"
 fi
+
 echo "tgenv ${git_revision:-$version}"

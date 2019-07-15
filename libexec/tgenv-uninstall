@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
 
-function error_and_die() {
-  echo -e "tgenv: $(basename ${0}): \033[0;31m[ERROR] ${1}\033[0;39m" >&2
-  exit 1
-}
-
-function info() {
-  echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
-}
-
 [ -n "${TGENV_DEBUG}" ] && set -x
+source "${TGENV_ROOT}/libexec/helpers"
 
-[ ${#} -gt 1 ] && error_and_die "usage: tgenv uninstall [<version>]"
+[ "${#}" -gt 1 ] && error_and_die "usage: tgenv uninstall [<version>]"
 
 declare version_requested version regex
 
 if [ -z "${1}" ]; then
   version_file="$(tgenv-version-file)"
   if [ "${version_file}" != "${TGENV_ROOT}/version" ];then
-    version_requested="$(cat ${version_file} || true)"
+    version_requested="$(cat "${version_file}" || true)"
   fi
 else
   version_requested="${1}"
@@ -32,11 +24,11 @@ elif [[ "${version_requested}" =~ ^latest$ ]]; then
   regex=""
 else
   version="${version_requested}"
-  regex="${version_requested}"
+  regex="^${version_requested}$"
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"
-version="$(tgenv-list | grep -e "${regex}" | head -n 1)"
+version="$(tgenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in local"
 
 dst_path="${TGENV_ROOT}/versions/${version}"
@@ -45,4 +37,3 @@ if [ -f "${dst_path}/terragrunt" ]; then
   rm -r "${dst_path}"
   info "\033[0;32mTerragrunt v${version} is successfully uninstalled\033[0;39m"
 fi
-

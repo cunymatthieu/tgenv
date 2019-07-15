@@ -16,8 +16,7 @@
 set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 
-tg_v_n=`tgenv-version-name`
-export TGENV_VERSION="$tg_v_n"
+export TGENV_VERSION="$(tgenv-version-name)"
 TG_BIN_PATH="${TGENV_ROOT}/versions/${TGENV_VERSION}/terragrunt"
 export PATH="${TG_BIN_PATH}:${PATH}"
 "${TG_BIN_PATH}" "${@}"

@@ -1,11 +1,8 @@
 #!/usr/bin/env bash
-#set -e
-
-function warn_and_continue() {
-  echo -e "tgenv: $(basename ${0}): \033[0;33m[WARN] ${1}\033[0;39m" >&2
-}
+set -e
 
 [ -n "${TGENV_DEBUG}" ] && set -x
+source "${TGENV_ROOT}/libexec/helpers"
 
 if [ ${#} -ne 0 ];then
   echo "usage: tgenv list-remote" 1>&2
@@ -13,7 +10,7 @@ if [ ${#} -ne 0 ];then
 fi
 
 link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
-print=`curl --tlsv1.2 -sf $link_release`
+print=$(curl --tlsv1.2 -sf $link_release)
 
 return_code=$?
 if [ $return_code -eq 22 ];then

@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-function error_and_die() {
-  echo -e "tgenv: ${0}: ${1}" >&2
-  exit 1
-}
-
 [ -n "${TGENV_DEBUG}" ] && set -x
+source "${TGENV_ROOT}/libexec/helpers"
 
-[ ${#} -ne 0 ] \
+[ "${#}" -ne 0 ] \
   && error_and_die "usage: tgenv list"
 
 [ -d "${TGENV_ROOT}/versions" ] \
@@ -16,4 +12,14 @@ function error_and_die() {
 [[ -x "${TGENV_ROOT}/versions" && -r "${TGENV_ROOT}/versions" ]] \
   || error_and_die "tgenv versions directory is inaccessible!"
 
-ls -1 "${TGENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3
+print_version () {
+    if [ "${1}" == "$(tgenv-version-name)" ]; then
+        echo "* ${1} (set by $(tgenv-version-file))"
+    else
+        echo "  ${1}"
+    fi
+}
+
+for local_version in $(ls -1 "${TGENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3); do
+    print_version "${local_version}"
+done

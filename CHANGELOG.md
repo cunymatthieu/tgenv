@@ -1,3 +1,7 @@
+## 0.1.0 (Jully 15, 2019)
+
+* update script
+
 ## 0.0.2 (May 3, 2017)
 
  * Add last version on terragrunt 0.12.16
