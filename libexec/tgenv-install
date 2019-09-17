@@ -1,19 +1,7 @@
 #!/usr/bin/env bash
 
-function error_and_die() {
-  echo -e "tgenv: $(basename ${0}): \033[0;31m[ERROR] ${1}\033[0;39m" >&2
-  exit 1
-}
-
-function warn_and_continue() {
-  echo -e "tgenv: $(basename ${0}): \033[0;33m[WARN] ${1}\033[0;39m" >&2
-}
-
-function info() {
-  echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
-}
-
 [ -n "${TGENV_DEBUG}" ] && set -x
+source "${TGENV_ROOT}/libexec/helpers"
 
 [ "${#}" -gt 1 ] && error_and_die "usage: tgenv install [<version>]"
 
@@ -22,7 +10,7 @@ declare version_requested version regex
 if [ -z "${1}" ]; then
   version_file="$(tgenv-version-file)"
   if [ "${version_file}" != "${TGENV_ROOT}/version" ]; then
-    version_requested="$(cat ${version_file} || true)"
+    version_requested="$(cat "${version_file}" || true)"
   fi
 else
   version_requested="${1}"
@@ -33,10 +21,10 @@ if [[ "${version_requested}" =~ ^latest\:.*$ ]]; then
   regex="${version_requested##*\:}"
 elif [[ "${version_requested}" =~ ^latest$ ]]; then
   version="${version_requested}"
-  regex=""
+  regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$"
 else
   version="${version_requested}"
-  regex="${version_requested}"
+  regex="^${version_requested}$"
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"
@@ -49,29 +37,37 @@ if [ -f "${dst_path}/terragrunt" ]; then
   exit 0
 fi
 
+TGENV_ARCH="${TGENV_ARCH:-amd64}"
 case "$(uname -s)" in
   Darwin*)
-    os="darwin_amd64"
+    os="darwin_${TGENV_ARCH}"
     ;;
   MINGW64*)
-    os="windows_amd64"
+    os="windows_${TGENV_ARCH}"
+    ;;
+  MSYS_NT*)
+    os="windows_${TGENV_ARCH}"
+    ;;
+  CYGWIN_NT*)
+    os="windows_${TGENV_ARCH}"
     ;;
   *)
-    os="linux_amd64"
+    os="linux_${TGENV_ARCH}"
     ;;
 esac
 
 version_url="https://github.com/gruntwork-io/terragrunt/releases/download/v${version}"
 
-tarball_name="terragrunt_${os}"
+tarball_name="terragrunt_${os}";
 
 info "Installing Terragrunt v${version}"
 
 mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
 
 info "Downloading release tarball from ${version_url}/${tarball_name}"
-curl -# --tlsv1.2 --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+curlw -# --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
 
 chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
 
 info "Installation of terragrunt v${version} successful"
+tgenv-use "${version}"
