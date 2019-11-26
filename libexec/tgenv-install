@@ -43,13 +43,13 @@ case "$(uname -s)" in
     os="darwin_${TGENV_ARCH}"
     ;;
   MINGW64*)
-    os="windows_${TGENV_ARCH}"
+    os="windows_${TGENV_ARCH}.exe"
     ;;
   MSYS_NT*)
-    os="windows_${TGENV_ARCH}"
+    os="windows_${TGENV_ARCH}.exe"
     ;;
   CYGWIN_NT*)
-    os="windows_${TGENV_ARCH}"
+    os="windows_${TGENV_ARCH}.exe"
     ;;
   *)
     os="linux_${TGENV_ARCH}"
