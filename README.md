@@ -131,6 +131,29 @@ $ terragrunt --version
 terragrunt v0.10.3
 ```
 
+### Environment Variables
+
+#### TGENV
+
+##### `TGENV_AUTO_INSTALL`
+
+String (Default: true)
+
+Should tgenv automatically install terragrunt if the version specified by defaults or a .terragrunt-version file is not currently installed.
+
+```console
+TGENV_AUTO_INSTALL=false terragrunt plan
+```
+
+##### `TGENV_DEBUG`
+
+Integer (Default: "")
+
+Set the debug level for TGENV.
+
+* unset/empty-string: No debug output
+* set: Bash execution tracing
+
 ## Upgrading
 ```bash
 $ git --git-dir=~/.tgenv/.git pull
