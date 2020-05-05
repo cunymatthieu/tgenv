@@ -19,17 +19,16 @@ source $(dirname $0)/helpers.sh \
 echo "### List local versions"
 cleanup || error_and_die "Cleanup failed?!"
 
-for v in 0.12.15 0.12.9 0.11.1 0.10.0 0.9.3; do
+for v in 0.23.13 0.23.10 0.22.5 0.22.2; do
   tgenv install ${v} || error_and_proceed "Install of version ${v} failed"
 done
 
 result=$(tgenv list)
 expected="$(cat << EOS
-0.12.15
-0.12.9
-0.11.1
-0.10.0
-0.9.3
+  0.23.13
+  0.23.10
+  0.22.5
+* 0.22.2 (set by $(tgenv version-file))
 EOS
 )"
 

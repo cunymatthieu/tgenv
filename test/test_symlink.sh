@@ -23,9 +23,9 @@ export PATH="${TGENV_BIN_DIR}:${PATH}"
 
 echo "### Test supporting symlink"
 cleanup || error_and_die "Cleanup failed?!"
-tgenv install 0.12.15 || error_and_proceed "Install failed"
-tgenv use 0.12.15 || error_and_proceed "Use failed"
-check_version 0.12.15 || error_and_proceed "Version check failed"
+tgenv install 0.23.13 || error_and_proceed "Install failed"
+tgenv use 0.23.13 || error_and_proceed "Use failed"
+check_version 0.23.13 || error_and_proceed "Version check failed"
 
 if [ ${#errors[@]} -gt 0 ]; then
   echo -e "\033[0;31m===== The following symlink tests failed =====\033[0;39m" >&2

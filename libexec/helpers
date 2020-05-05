@@ -10,7 +10,7 @@ function warn_and_continue() {
 }
 
 function info() {
-  echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
+  echo -e "\033[0;32m[INFO] ${1}\033[0;39m" >&2
 }
 
 # Curl wrapper to switch TLS option for each OS
