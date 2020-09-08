@@ -9,8 +9,28 @@ if [ ${#} -ne 0 ];then
   exit 1
 fi
 
-link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
-print=$(curl --tlsv1.2 -sf $link_release)
+GITHUB_API_HEADER_ACCEPT="Accept: application/vnd.github.v3+json"
+
+temp=`basename $0`
+TMPFILE=`mktemp /tmp/${temp}.XXXXXX` || exit 1
+
+function rest_call {
+    curl --tlsv1.2 -sf $1 -H "${GITHUB_API_HEADER_ACCEPT}" | sed -e 's/^\[$//g' -e 's/^\]$/,/g' >> $TMPFILE
+}
+
+# single page result-s (no pagination), have no Link: section, the grep result is empty
+last_page=`curl -I --tlsv1.2 -s "https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=100" -H "${GITHUB_API_HEADER_ACCEPT}" | grep '^link:' | sed -e 's/^link:.*page=//g' -e 's/>.*$//g'`
+
+# does this result use pagination?
+if [ -z "$last_page" ]; then
+    # no - this result has only one page
+    rest_call "https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=100"
+else
+    # yes - this result is on multiple pages
+    for p in `seq 1 $last_page`; do
+        rest_call "https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=100&page=$p"
+    done
+fi
 
 return_code=$?
 if [ $return_code -eq 22 ];then
@@ -18,4 +38,4 @@ if [ $return_code -eq 22 ];then
   print=`cat ${TGENV_ROOT}/list_all_versions_offline`
 fi
 
-echo $print | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
+cat $TMPFILE | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
