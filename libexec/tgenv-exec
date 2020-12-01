@@ -17,9 +17,9 @@ set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
-info 'Getting version from tgenv-version-name';
+debug 'Getting version from tgenv-version-name';
 TGENV_VERSION="$(tgenv-version-name)" \
-  && info "TGENV_VERSION is ${TGENV_VERSION}" \
+  && debug "TGENV_VERSION is ${TGENV_VERSION}" \
   || {
     # Errors will be logged from tgenv-version name,
     # we don't need to trouble STDERR with repeat information here

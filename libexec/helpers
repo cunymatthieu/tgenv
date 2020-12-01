@@ -9,6 +9,14 @@ function warn_and_continue() {
   echo -e "tgenv: $(basename ${0}): \033[0;33m[WARN] ${1}\033[0;39m" >&2
 }
 
+function debug() {
+  if [ -z "${TGENV_DEBUG}" ]; then
+    return
+  fi
+
+  echo -e "\033[0;34m[DEBUG] ${1}\033[0;39m"
+}
+
 function info() {
   echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
 }
