@@ -56,7 +56,11 @@ case "$(uname -s)" in
     ;;
 esac
 
-version_url="https://github.com/gruntwork-io/terragrunt/releases/download/v${version}"
+if [ -z ${tgenv_version_url} ]; then
+    version_url="https://github.com/gruntwork-io/terragrunt/releases/download/v${version}"
+else
+    version_url="${tgenv_version_url}/v${version}"
+fi
 
 tarball_name="terragrunt_${os}";
 
