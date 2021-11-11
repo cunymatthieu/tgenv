@@ -1,37 +1,140 @@
 #!/usr/bin/env bash
-# Summary: Show the current Terragrunt version
-set -e
+# Summary: Show the currently-selected terragrunt version
 
-[ -n "${TGENV_DEBUG}" ] && set -x
-source "${TGENV_ROOT}/libexec/helpers"
+set -uo pipefail;
 
-[ -d "${TGENV_ROOT}/versions" ] \
-  || error_and_die "No versions of terragrunt installed. Please install one with: tgenv install"
+####################################
+# Ensure we can execute standalone #
+####################################
 
-TGENV_VERSION_FILE="$(tgenv-version-file)"
-TGENV_VERSION="$(cat "${TGENV_VERSION_FILE}" || true)"
+function early_death() {
+  echo "[FATAL] ${0}: ${1}" >&2;
+  exit 1;
+};
+
+if [ -z "${TGENV_ROOT:-""}" ]; then
+  # http://stackoverflow.com/questions/1055671/how-can-i-get-the-behavior-of-gnus-readlink-f-on-a-mac
+  readlink_f() {
+    local target_file="${1}";
+    local file_name;
+
+    while [ "${target_file}" != "" ]; do
+      cd "$(dirname ${target_file})" || early_death "Failed to 'cd \$(dirname ${target_file})' while trying to determine TGENV_ROOT";
+      file_name="$(basename "${target_file}")" || early_death "Failed to 'basename \"${target_file}\"' while trying to determine TGENV_ROOT";
+      target_file="$(readlink "${file_name}")";
+    done;
+
+    echo "$(pwd -P)/${file_name}";
+  };
+
+  TGENV_ROOT="$(cd "$(dirname "$(readlink_f "${0}")")/.." && pwd)";
+  [ -n "${TGENV_ROOT}" ] || early_death "Failed to 'cd \"\$(dirname \"\$(readlink_f \"${0}\")\")/..\" && pwd' while trying to determine TGENV_ROOT";
+else
+  TGENV_ROOT="${TGENV_ROOT%/}";
+fi;
+export TGENV_ROOT;
+
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
+# Ensure libexec and bin are in $PATH
+for dir in libexec bin; do
+  case ":${PATH}:" in
+    *:${TGENV_ROOT}/${dir}:*) log 'debug' "\$PATH already contains '${TGENV_ROOT}/${dir}', not adding it again";;
+    *)
+      log 'debug' "\$PATH does not contain '${TGENV_ROOT}/${dir}', prepending and exporting it now";
+      export PATH="${TGENV_ROOT}/${dir}:${PATH}";
+      ;;
+  esac;
+done;
+
+#####################
+# Begin Script Body #
+#####################
+
+if [[ -z "${TGENV_TERRAGRUNT_VERSION:-""}" ]]; then
+  TGENV_VERSION_FILE="$(tgenv-version-file)" \
+    && log 'debug' "TGENV_VERSION_FILE retrieved from tgenv-version-file: ${TGENV_VERSION_FILE}" \
+    || log 'error' 'Failed to retrieve TGENV_VERSION_FILE from tgenv-version-file';
+
+  TGENV_VERSION="$(cat "${TGENV_VERSION_FILE}" || true)" \
+    && log 'debug' "TGENV_VERSION specified in TGENV_VERSION_FILE: ${TGENV_VERSION}";
+
+  TGENV_VERSION_SOURCE="${TGENV_VERSION_FILE}";
+else
+  TGENV_VERSION="${TGENV_TERRAGRUNT_VERSION}" \
+    && log 'debug' "TGENV_VERSION specified in TGENV_TERRAGRUNT_VERSION: ${TGENV_VERSION}";
+
+  TGENV_VERSION_SOURCE='TGENV_TERRAGRUNT_VERSION';
+fi;
 
 if [[ "${TGENV_VERSION}" =~ ^latest.*$ ]]; then
-  [[ "${TGENV_VERSION}" =~ ^latest\:.*$ ]] && regex="${TGENV_VERSION##*\:}"
-  version="$(\ls "${TGENV_ROOT}/versions" \
-    | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
-    | grep -e "${regex}" \
-    | head -n 1
-  )"
-  [ -n "${version}" ] || error_and_die "No installed versions of terragrunt matched '${TGENV_VERSION}'"
-  TGENV_VERSION="${version}"
-fi
+  log 'debug' "TGENV_VERSION uses 'latest' keyword: ${TGENV_VERSION}";
 
-[ -z "${TGENV_VERSION}" ] \
-  && error_and_die "Version could not be resolved (set by ${TGENV_VERSION_FILE} or tgenv use <version>)"
+  [ -d "${TGENV_CONFIG_DIR}/versions" ] \
+    || log 'error' 'No versions of terragrunt installed. Please install one with: tgenv install';
 
-version_exists() {
-  local version="${1}"
-  [ -d "${TGENV_ROOT}/versions/${version}" ]
-}
+  if [[ "${TGENV_VERSION}" =~ ^latest\:.*$ ]]; then
+    regex="${TGENV_VERSION##*\:}";
+    log 'debug' "'latest' keyword uses regex: ${regex}";
+  else
+    regex="^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+    log 'debug' "Version uses latest keyword alone. Forcing regex to match stable versions only: ${regex}";
+  fi;
 
-if ! version_exists "${TGENV_VERSION}"; then
-  warn_and_continue "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_FILE})"
-fi
+  declare local_version='';
+  if [[ -d "${TGENV_CONFIG_DIR}/versions" ]]; then
+    local_version="$(\find "${TGENV_CONFIG_DIR}/versions/" -type d -exec basename {} \; \
+      | tail -n +2 \
+      | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
+      | grep -e "${regex}" \
+      | head -n 1)";
+  fi;
 
-echo "${TGENV_VERSION}"
+  if [[ "${TGENV_AUTO_INSTALL:-true}" == "true" ]]; then
+    log 'debug' "Trying to find the remote version using the regex: ${regex}";
+    remote_version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)";
+    if [[ -n "${remote_version}" ]]; then
+        if [[ "${local_version}" != "${remote_version}" ]]; then
+          log 'debug' "The installed version '${local_version}' does not much the remote version '${remote_version}'";
+          TGENV_VERSION="${remote_version}";
+        else
+          TGENV_VERSION="${local_version}";
+        fi;
+    else
+      log 'error' "No versions matching '${requested}' found in remote";
+    fi;
+  else
+    if [[ -n "${local_version}" ]]; then
+      TGENV_VERSION="${local_version}";
+    else
+      log 'error' "No installed versions of terragrunt matched '${TGENV_VERSION}'";
+    fi;
+  fi;
+else
+  log 'debug' 'TGENV_VERSION does not use "latest" keyword';
+
+  # Accept a v-prefixed version, but strip the v.
+  if [[ "${TGENV_VERSION}" =~ ^v.*$ ]]; then
+    log 'debug' "Version Requested is prefixed with a v. Stripping the v."
+    TGENV_VERSION="${TGENV_VERSION#v*}";
+  fi;
+fi;
+
+if [[ -z "${TGENV_VERSION}" ]]; then
+  log 'error' "Version could not be resolved (set by ${TGENV_VERSION_SOURCE} or tgenv use <version>)";
+fi;
+
+if [[ ! -d "${TGENV_CONFIG_DIR}/versions/${TGENV_VERSION}" ]]; then
+  log 'debug' "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_SOURCE})";
+fi;
+
+echo "${TGENV_VERSION}";
