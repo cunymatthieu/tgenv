@@ -3,11 +3,22 @@
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
 [ "${#}" -gt 1 ] && error_and_die "usage: tgenv install [<version>]"
 
 declare version_requested version regex
 
-if [ -z "${1}" ]; then
+if [ -z "${1:-""}" ]; then
   version_file="$(tgenv-version-file)"
   if [ "${version_file}" != "${TGENV_ROOT}/version" ]; then
     version_requested="$(cat "${version_file}" || true)"
@@ -31,7 +42,7 @@ fi
 version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
 
-dst_path="${TGENV_ROOT}/versions/${version}"
+dst_path="${TGENV_CONFIG_DIR}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then
   echo "Terragrunt v${version} is already installed"
   exit 0

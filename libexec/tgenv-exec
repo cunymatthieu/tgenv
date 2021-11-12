@@ -17,6 +17,17 @@ set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
 info 'Getting version from tgenv-version-name';
 TGENV_VERSION="$(tgenv-version-name)" \
   && info "TGENV_VERSION is ${TGENV_VERSION}" \
@@ -27,7 +38,7 @@ TGENV_VERSION="$(tgenv-version-name)" \
   };
 export TGENV_VERSION;
 
-if [ ! -d "${TGENV_ROOT}/versions/${TGENV_VERSION}" ]; then
+if [ ! -d "${TGENV_CONFIG_DIR}/versions/${TGENV_VERSION}" ]; then
   if [ "${TGENV_AUTO_INSTALL:-false}" == "true" ]; then
     info "version '${TGENV_VERSION}' is not installed (set by $(tgenv-version-file)). Installing now as TGENV_AUTO_INSTALL==true";
     tgenv-install;
@@ -36,6 +47,6 @@ if [ ! -d "${TGENV_ROOT}/versions/${TGENV_VERSION}" ]; then
   fi;
 fi;
 
-TG_BIN_PATH="${TGENV_ROOT}/versions/${TGENV_VERSION}/terragrunt"
+TG_BIN_PATH="${TGENV_CONFIG_DIR}/versions/${TGENV_VERSION}/terragrunt"
 export PATH="${TG_BIN_PATH}:${PATH}"
 "${TG_BIN_PATH}" "${@}"
