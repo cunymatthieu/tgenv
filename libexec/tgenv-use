@@ -3,6 +3,17 @@
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
 [ "${#}" -ne 1 ] && error_and_die "usage: tgenv use <version>"
 
 declare version_requested version regex
@@ -20,10 +31,10 @@ else
   regex="^${version_requested}$"
 fi
 
-[ -d "${TGENV_ROOT}/versions" ] \
+[ -d "${TGENV_CONFIG_DIR}/versions" ] \
   || error_and_die "No versions of terragrunt installed. Please install one with: tgenv install"
 
-version="$(\ls "${TGENV_ROOT}/versions" \
+version="$(\ls "${TGENV_CONFIG_DIR}/versions" \
   | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
   | grep -e "${regex}" \
   | head -n 1
@@ -31,7 +42,7 @@ version="$(\ls "${TGENV_ROOT}/versions" \
 
 [ -n "${version}" ] || error_and_die "No installed versions of terragrunt matched '${1}'"
 
-target_path="${TGENV_ROOT}/versions/${version}"
+target_path="${TGENV_CONFIG_DIR}/versions/${version}"
 [ -f "${target_path}/terragrunt" ] \
   || error_and_die "Version directory for ${version} is present, but the terragrunt binary is not! Manual intervention required."
 [ -x "${target_path}/terragrunt" ] \

@@ -4,6 +4,17 @@
 set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 
+if [ -n "${TGENV_HELPERS:-""}" ]; then
+  log 'debug' 'TGENV_HELPERS is set, not sourcing helpers again';
+else
+  [ "${TGENV_DEBUG:-0}" -gt 0 ] && echo "[DEBUG] Sourcing helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  if source "${TGENV_ROOT}/lib/helpers.sh"; then
+    log 'debug' 'Helpers sourced successfully';
+  else
+    early_death "Failed to source helpers from ${TGENV_ROOT}/lib/helpers.sh";
+  fi;
+fi;
+
 find_local_version_file() {
   local root="${1}"
   while ! [[ "${root}" =~ ^//[^/]*$ ]]; do
@@ -17,4 +28,4 @@ find_local_version_file() {
   return 1
 }
 
-find_local_version_file "${TGENV_DIR}" || find_local_version_file "${HOME}" || echo "${TGENV_ROOT}/version"
+find_local_version_file "${TGENV_DIR}" || find_local_version_file "${HOME}" || echo "${TGENV_CONFIG_DIR}/version"
