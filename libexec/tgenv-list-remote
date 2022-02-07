@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
@@ -14,7 +13,7 @@ print=$(curl --tlsv1.2 -sf $link_release)
 
 return_code=$?
 if [ $return_code -eq 22 ];then
-  warn_and_continue "Failed to get list verion on $link_release"
+  warn_and_continue "Failed to get list version on $link_release"
   print=`cat ${TGENV_ROOT}/list_all_versions_offline`
 fi
 
