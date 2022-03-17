@@ -37,7 +37,16 @@ if [ -f "${dst_path}/terragrunt" ]; then
   exit 0
 fi
 
-TGENV_ARCH="${TGENV_ARCH:-amd64}"
+# Add support of ARM64 for Linux & Apple Silicon
+case "$(uname -m)" in
+  aarch64* | arm64*)
+    TGENV_ARCH="${TGENV_ARCH:-arm64}";
+    ;;
+  *)
+    TGENV_ARCH="${TGENV_ARCH:-amd64}";
+    ;;
+esac;
+
 case "$(uname -s)" in
   Darwin*)
     os="darwin_${TGENV_ARCH}"
