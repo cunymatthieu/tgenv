@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-set -e
 pages=4
 
 [ -n "${TGENV_DEBUG}" ] && set -x
