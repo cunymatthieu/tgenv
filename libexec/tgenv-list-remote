@@ -8,9 +8,9 @@ page_curl=$(curl --tlsv1.2 --head "$link_release")
 only_relevant_part=$(echo "$page_curl" | grep -o -E "&page=[0-9]+>; rel=\"last")
 re="([0-9]+)"
 if [[ $only_relevant_part =~ $re ]] ; then
-  pages=${BASH_REMATCH[0]} # extracts the page number
+  pages=${BASH_REMATCH[0]}
 else
-  pages=4 # default in case something changes in teh way the responses are formatted
+  pages=4 # default in case something changes in the way the responses are formatted
 fi
 
 [ -n "${TGENV_DEBUG}" ] && set -x
