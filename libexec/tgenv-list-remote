@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
-pages=4
+set -e
+
+link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
+
+# the  response header (--head) contains a link to the last page, contains the last page number and the "last" keyword to help identify
+page_curl=$(curl -s --tlsv1.2 --head "$link_release")
+last_page_phrase=$(echo "$page_curl" | grep -o -E "&page=[0-9]+>; rel=\"last")
+re="([0-9]+)"
+if [[ $last_page_phrase =~ $re ]] ; then
+  pages=${BASH_REMATCH[0]}
+else
+  pages=4 # default in case something changes in the way the responses are formatted
+fi
 
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
