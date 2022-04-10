@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -e
-
 link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
 
 # the  response header (--head) contains a link to the last page, contains the last page number and the "last" keyword to help identify
