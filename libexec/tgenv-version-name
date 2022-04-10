@@ -30,8 +30,8 @@ version_exists() {
   [ -d "${TGENV_ROOT}/versions/${version}" ]
 }
 
-if ! version_exists "${TGENV_VERSION}"; then
-  warn_and_continue "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_FILE})"
+if version_exists "${TGENV_VERSION}"; then
+  echo "${TGENV_VERSION}"
+else
+  error_and_die "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_FILE})"
 fi
-
-echo "${TGENV_VERSION}"
