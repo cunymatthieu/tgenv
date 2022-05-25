@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cunymatthieu/tgenv.svg?branch=master)](https://travis-ci.org/cunymatthieu/tgenv)
+[![Build Status](https://travis-ci.org/env0/tgenv.svg?branch=master)](https://travis-ci.org/env0/tgenv)
 
 # tgenv
 [Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tfenv)
@@ -14,7 +14,7 @@ Currently tgenv supports the following OSes
 1. Check out tgenv into any path (here is `${HOME}/.tgenv`)
 
   ```bash
-  $ git clone https://github.com/cunymatthieu/tgenv.git ~/.tgenv
+  $ git clone https://github.com/env0/tgenv.git ~/.tgenv
   ```
 
 2. Add `~/.tgenv/bin` to your `$PATH` any way you like
@@ -142,5 +142,5 @@ $ rm -rf /some/path/to/tgenv
 ```
 
 ## LICENSE
-- [tgenv itself](https://github.com/cunymatthieu/tgenv/blob/master/LICENSE)
+- [tgenv itself](https://github.com/env0/tgenv/blob/master/LICENSE)
 - [tfenv ](https://github.com/kamatama41/tgenv/blob/master/LICENSE) : tfenv mainly uses tfenv's source code
