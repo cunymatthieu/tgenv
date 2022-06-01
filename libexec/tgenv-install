@@ -76,7 +76,7 @@ if [ "$curl_status" -eq 0 ]; then
 else
     # make sure versions folder not exists, so we can retry installation
     rm -rf "${dst_path}"
-    error_and_die "Tarball download failed ${check}"
+    error_and_die "Tarball download failed"
 fi
 
 
