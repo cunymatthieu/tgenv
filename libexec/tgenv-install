@@ -74,7 +74,7 @@ if [ "$curl_status" -eq 0 ]; then
   info "Installation of terragrunt v${version} successful"
   tgenv-use "${version}"
 else
-    # make sure versions folder not exists, so we can retry installation
+    # make sure versions folder does not exist, so we can retry installation
     rm -rf "${dst_path}"
     error_and_die "Tarball download failed"
 fi
