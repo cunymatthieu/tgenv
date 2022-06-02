@@ -143,4 +143,4 @@ $ rm -rf /some/path/to/tgenv
 
 ## LICENSE
 - [tgenv itself](https://github.com/env0/tgenv/blob/master/LICENSE)
-- [tfenv ](https://github.com/kamatama41/tgenv/blob/master/LICENSE) : tfenv mainly uses tfenv's source code
+- [tfenv ](https://github.com/kamatama41/tfenv/blob/master/LICENSE) : tgenv mainly uses tfenv's source code
