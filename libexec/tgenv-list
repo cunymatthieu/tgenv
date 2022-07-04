@@ -6,10 +6,10 @@ source "${TGENV_ROOT}/libexec/helpers"
 [ "${#}" -ne 0 ] \
   && error_and_die "usage: tgenv list"
 
-[ -d "${TGENV_ROOT}/versions" ] \
+[ -d "${TGENV_CONFIG_DIR}/versions" ] \
   || error_and_die "No versions available. Please install one with: tgenv install"
 
-[[ -x "${TGENV_ROOT}/versions" && -r "${TGENV_ROOT}/versions" ]] \
+[[ -x "${TGENV_CONFIG_DIR}/versions" && -r "${TGENV_CONFIG_DIR}/versions" ]] \
   || error_and_die "tgenv versions directory is inaccessible!"
 
 print_version () {
@@ -20,6 +20,6 @@ print_version () {
     fi
 }
 
-for local_version in $(ls -1 "${TGENV_ROOT}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3); do
+for local_version in $(ls -1 "${TGENV_CONFIG_DIR}/versions" | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3); do
     print_version "${local_version}"
 done
