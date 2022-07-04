@@ -130,6 +130,15 @@ $ echo latest:^0.10 > .terragrunt-version
 $ terragrunt --version
 terragrunt v0.10.3
 ```
+### Environment Variables
+
+#### TGENV
+
+##### `TGENV_CONFIG_DIR`
+
+Path (Default: `$TGENV_ROOT`)
+
+The path to a directory where the local terragrunt versions and configuration files exist.
 
 ## Upgrading
 ```bash
