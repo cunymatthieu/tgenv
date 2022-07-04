@@ -1,6 +1,6 @@
 ## 0.1.0 (Jully 15, 2019)
 
-* update script 
+* update script
 
 ## 0.0.2 (May 3, 2017)
 
