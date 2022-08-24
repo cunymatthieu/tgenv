@@ -27,9 +27,22 @@ else
   regex="^${version_requested}$"
 fi
 
+echo "${version}"
+echo "${regex}"
+
 [ -n "${version}" ] || error_and_die "Version is not specified"
-version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)"
-[ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
+# if the version is already installed on this host, don't attempt to fetch remote
+# just switch to this version and save an API call
+dst_path="${TGENV_ROOT}/versions/${version}"
+if [[ -e "${dst_path}" ]]; then
+  echo "Terragrunt v${version} is already installed"
+  tgenv-use "${version}"
+  exit 0
+# otherwise if the version is not already installed, find it in the remote versions and install it
+else
+  version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)"
+  [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
+fi
 
 dst_path="${TGENV_ROOT}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then
