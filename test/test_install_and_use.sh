@@ -39,7 +39,7 @@ v=$(tgenv list-remote | grep 0.11.1 | head -n 1)
 echo "### Install specific version"
 cleanup || error_and_die "Cleanup failed?!"
 
-v=0.9.9
+v=0.35.13
 (
   tgenv install ${v} || exit 1
   tgenv use ${v} || exit 1
