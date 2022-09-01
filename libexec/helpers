@@ -10,6 +10,7 @@ function warn_and_continue() {
 }
 
 function info() {
+  [ -z "${TGENV_DEBUG:-}" ] && return;
   echo -e "\033[0;32m[INFO] ${1}\033[0;39m"
 }
 
