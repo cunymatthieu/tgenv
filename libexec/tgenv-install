@@ -61,23 +61,29 @@ tarball_name="terragrunt_${os}";
 info "Installing Terragrunt v${version}"
 
 function install() {
-  mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
+  http_code=$(curlw -# --location-trusted -w "%{http_code}" -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}")
+  curl_exit_code=$?
 
-  info "Downloading release tarball from ${version_url}/${tarball_name}"
-  curlw -# --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}"
-  curl_status=$?
-  if [ "$curl_status" -eq 0 ]; then
-
-    chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
-
-    info "Installation of terragrunt v${version} successful"
-    retry "tgenv-use ${version}" 3 3
-    return 0
+  if [[ curl_exit_code -ne 0 ]] || [[ http_code =~ ^5 ]]; then
+    return 1 # fail
   else
-    # make sure versions folder does not exist, so we can retry installation
-    rm -rf "${dst_path}"
-    return 1
+    return 0 # success
   fi
 }
 
+
+mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
+
+info "Downloading release tarball from ${version_url}/${tarball_name}"
 retry install 5 10 || error_and_die "Tarball download failed"
+
+if [ "$curl_status" -eq 0 ]; then
+
+  chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
+
+  info "Installation of terragrunt v${version} successful"
+  retry "tgenv-use ${version}" 5 3 || error_and_die "tgenv use failed"
+else
+  # make sure versions folder does not exist, so we can retry installation
+  rm -rf "${dst_path}"
+fi
