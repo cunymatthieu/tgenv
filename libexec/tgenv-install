@@ -60,19 +60,24 @@ tarball_name="terragrunt_${os}";
 
 info "Installing Terragrunt v${version}"
 
-mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
+function install() {
+  mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
 
-info "Downloading release tarball from ${version_url}/${tarball_name}"
-curlw -# --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}"
-curl_status=$?
-if [ "$curl_status" -eq 0 ]; then
+  info "Downloading release tarball from ${version_url}/${tarball_name}"
+  curlw -# --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}"
+  curl_status=$?
+  if [ "$curl_status" -eq 0 ]; then
 
-  chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
+    chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
 
-  info "Installation of terragrunt v${version} successful"
-  tgenv-use "${version}"
-else
+    info "Installation of terragrunt v${version} successful"
+    tgenv-use "${version}"
+    return 0
+  else
     # make sure versions folder does not exist, so we can retry installation
     rm -rf "${dst_path}"
-    error_and_die "Tarball download failed"
-fi
+    return 1
+  fi
+}
+
+retry install 10 5 || error_and_die "Tarball download failed"
