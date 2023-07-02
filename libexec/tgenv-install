@@ -71,7 +71,7 @@ function install() {
     chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
 
     info "Installation of terragrunt v${version} successful"
-    retry "tgenv-use \"${version}\"" 3 3
+    retry "tgenv-use ${version}" 3 3
     return 0
   else
     # make sure versions folder does not exist, so we can retry installation
