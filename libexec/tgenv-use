@@ -3,6 +3,8 @@
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
+error_and_die "'terragrunt --version' failed. Something is seriously wrong"
+
 [ "${#}" -ne 1 ] && error_and_die "usage: tgenv use <version>"
 
 declare version_requested version regex
