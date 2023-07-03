@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+# Echos the tag of Terragrunt latest release without the 'v' prefix
+
+latest_release="https://api.github.com/repos/gruntwork-io/terragrunt/releases/latest"
+
+# jq is part of our base image:
+# https://github.com/env0/env0/blob/4621fb69b05c220d5968d7c4556d69eaa00df0d4/prerequisites/3rd-party-libs-image/base.Dockerfile#L12C5-L12C7
+res=$(curl -s "$latest_release" | jq -r '.tag_name' | cut -c 2-)
+
+echo $res
