@@ -24,28 +24,3 @@ function curlw () {
 
   curl ${TLS_OPT} "$@"
 }
-
-function retry() {
-  local command="$1"
-  local tries="${2:-5}"
-  local sleep="${3:-3}"
-
-  if [[ $# -eq 0 ]] ; then
-    echo 'Please insert a function or command as the first argument.'
-    exit 1
-  fi
-
-  for ((i = 1; i <= tries; i++)); do
-    if ((i > 1)); then
-      echo "Attempt $((i-1)) failed. Retrying after $sleep seconds..."
-      sleep "$sleep"
-    fi
-
-    if $command; then
-      return 0
-    fi
-  done
-
-  echo "Command failed after $tries attempts."
-  return 1
-}
