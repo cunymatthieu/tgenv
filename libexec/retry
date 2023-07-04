@@ -12,9 +12,14 @@ usage() {
   echo "  -sleep <seconds>           Sleep interval between tries (default: 5)"
   echo "  -tries <count>             Maximum number of tries (default: 3)"
   echo "  -stop-on-exit-code <code>  Exit loop if command returns the specified code"
-  echo "  -help                      Display this help message"
+  echo "  -help, -h                  Display this help message"
   exit 1
 }
+
+# Check if a command is provided
+if [[ $# -eq 0 ]]; then
+  usage
+fi
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -39,11 +44,6 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
-
-# Check if a command is provided
-if [[ $# -eq 0 ]]; then
-  usage
-fi
 
 # Execute the command in a loop until success or maximum tries reached
 counter=0
