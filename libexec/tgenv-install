@@ -66,17 +66,25 @@ function install_tg_version() {
   http_code=$(curlw -# --location-trusted -w "%{http_code}" -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}")
   local curl_exit_code=$?
 
+  local result_code
   if [[ $http_code =~ ^4 ]]; then
     echo "Got $http_code http code, TG version is invalid"
-    return 2 # do not retry
+    result_code=2 # do not retry
   elif [[ $http_code =~ ^5 ]]; then
     echo "Got $http_code http code"
-    return 1 # retry
+    result_code=1 # retry
   elif [[ $curl_exit_code -ne 0 ]]; then
-    return 1 # retry
+    result_code=1 # retry
   else
-    return 0 # success
+    result_code=0 # success
   fi
+
+  if [[ $result_code -ne 0 ]]; then
+    # make sure versions folder does not exist, so we can retry installation
+    rm -rf "${dst_path}"
+  fi
+
+  return $result_code
 }
 
 
@@ -92,7 +100,4 @@ if [ "$install_exist_code" -eq 0 ]; then
 
   info "Installation of terragrunt v${version} successful"
   retry -sleep 3 tgenv-use "${version}" || error_and_die "tgenv use failed"
-else
-  # make sure versions folder does not exist, so we can retry installation
-  rm -rf "${dst_path}"
 fi
