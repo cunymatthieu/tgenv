@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+function info() {
+  echo -e "\033[0;32m[INFO] ${1}\033[0;39m" >&2
+}
+
 retry() {
   # Default values
   local tries=3
@@ -56,19 +60,19 @@ retry() {
     if [[ $exit_code -eq 0 ]]; then
       return 0
     elif [[ -n $stop_on_exit_code && $exit_code -eq $stop_on_exit_code ]]; then
-      echo "Exit code ($stop_on_exit_code) matching to condition. Won't retry, exiting."
+      info "Exit code ($stop_on_exit_code) matching to condition. Won't retry, exiting."
       return 1
     fi
 
     counter=$((counter + 1))
 
     if [[ $counter -lt $tries ]]; then
-      echo "Attempt $counter failed. Retrying after $sleep_interval seconds..."
+      info "Attempt $counter failed. Retrying after $sleep_interval seconds..."
       sleep "$sleep_interval"
     fi
   done
 
-  echo "Command failed after $tries attempts."
+  info "Command failed after $tries attempts."
   return 1
 }
 
