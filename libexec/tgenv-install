@@ -68,10 +68,10 @@ function install_tg_version() {
 
   local result_code
   if [[ $http_code =~ ^4 ]]; then
-    echo "Got $http_code http code, TG version is invalid"
+    error_log "Got $http_code http code, TG version is invalid"
     result_code=2 # do not retry
   elif [[ $http_code =~ ^5 ]]; then
-    echo "Got $http_code http code"
+    error_log "Got $http_code http code"
     result_code=1 # retry
   elif [[ $curl_exit_code -ne 0 ]]; then
     result_code=1 # retry
