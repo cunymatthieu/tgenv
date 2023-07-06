@@ -1,0 +1,78 @@
+#!/usr/bin/env bash
+
+retry() {
+  # Default values
+  local tries=3
+  local sleep_interval=5
+  local stop_on_exit_code=""
+
+  # Function to display script usage
+  usage() {
+    echo "Usage: retry [options] <command>"
+    echo "Options:"
+    echo "  -sleep <seconds>           Sleep interval between tries (default: 5)"
+    echo "  -tries <count>             Maximum number of tries (default: 3)"
+    echo "  -stop-on-exit-code <code>  Exit loop if command returns the specified code"
+    echo "  -help, -h                  Display this help message"
+    return 1
+  }
+
+  # Parse command-line options
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -sleep)
+        sleep_interval=$2
+        shift 2
+        ;;
+      -tries)
+        tries=$2
+        shift 2
+        ;;
+      -stop-on-exit-code)
+        stop_on_exit_code=$2
+        shift 2
+        ;;
+      -help | -h)
+        usage
+        ;;
+      *)
+        break
+        ;;
+    esac
+  done
+
+  # Check if a command is provided
+  if [[ $# -eq 0 ]]; then
+    usage
+    return 1
+  fi
+
+  # Execute the command in a loop until success or maximum tries reached
+  local counter=0
+  while [[ $counter -lt $tries ]]; do
+    "$@"
+    local exit_code=$?
+
+    if [[ $exit_code -eq 0 ]]; then
+      return 0
+    elif [[ -n $stop_on_exit_code && $exit_code -eq $stop_on_exit_code ]]; then
+      echo "Exit code ($stop_on_exit_code) matching to condition. Won't retry, exiting."
+      return 1
+    fi
+
+    counter=$((counter + 1))
+
+    if [[ $counter -lt $tries ]]; then
+      echo "Attempt $counter failed. Retrying after $sleep_interval seconds..."
+      sleep "$sleep_interval"
+    fi
+  done
+
+  echo "Command failed after $tries attempts."
+  return 1
+}
+
+# Call the retry function if the script is executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  retry "$@"
+fi
