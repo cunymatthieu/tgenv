@@ -5,7 +5,7 @@ set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
 
-[ -d "${TGENV_ROOT}/versions" ] \
+[ -d "${TGENV_CONFIG_DIR}/versions" ] \
   || error_and_die "No versions of terragrunt installed. Please install one with: tgenv install"
 
 TGENV_VERSION_FILE="$(tgenv-version-file)"
@@ -13,7 +13,7 @@ TGENV_VERSION="$(cat "${TGENV_VERSION_FILE}" || true)"
 
 if [[ "${TGENV_VERSION}" =~ ^latest.*$ ]]; then
   [[ "${TGENV_VERSION}" =~ ^latest\:.*$ ]] && regex="${TGENV_VERSION##*\:}"
-  version="$(\ls "${TGENV_ROOT}/versions" \
+  version="$(\ls "${TGENV_CONFIG_DIR}/versions" \
     | sort -t'.' -k 1nr,1 -k 2nr,2 -k 3nr,3 \
     | grep -e "${regex}" \
     | head -n 1
@@ -27,11 +27,11 @@ fi
 
 version_exists() {
   local version="${1}"
-  [ -d "${TGENV_ROOT}/versions/${version}" ]
+  [ -d "${TGENV_CONFIG_DIR}/versions/${version}" ]
 }
 
-if ! version_exists "${TGENV_VERSION}"; then
-  warn_and_continue "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_FILE})"
+if version_exists "${TGENV_VERSION}"; then
+  echo "${TGENV_VERSION}"
+else
+  error_and_die "version '${TGENV_VERSION}' is not installed (set by ${TGENV_VERSION_FILE})"
 fi
-
-echo "${TGENV_VERSION}"

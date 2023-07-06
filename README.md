@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/cunymatthieu/tgenv.svg?branch=master)](https://travis-ci.org/cunymatthieu/tgenv)
+[![Build Status](https://travis-ci.org/env0/tgenv.svg?branch=master)](https://travis-ci.org/env0/tgenv)
 
 # tgenv
 [Terragrunt](https://github.com/gruntwork-io/terragrunt) version manager inspired by [tfenv](https://github.com/kamatama41/tfenv)
@@ -14,7 +14,7 @@ Currently tgenv supports the following OSes
 1. Check out tgenv into any path (here is `${HOME}/.tgenv`)
 
   ```bash
-  $ git clone https://github.com/cunymatthieu/tgenv.git ~/.tgenv
+  $ git clone https://github.com/env0/tgenv.git ~/.tgenv
   ```
 
 2. Add `~/.tgenv/bin` to your `$PATH` any way you like
@@ -130,29 +130,15 @@ $ echo latest:^0.10 > .terragrunt-version
 $ terragrunt --version
 terragrunt v0.10.3
 ```
-
 ### Environment Variables
 
 #### TGENV
 
-##### `TGENV_AUTO_INSTALL`
+##### `TGENV_CONFIG_DIR`
 
-String (Default: true)
+Path (Default: `$TGENV_ROOT`)
 
-Should tgenv automatically install terragrunt if the version specified by defaults or a .terragrunt-version file is not currently installed.
-
-```console
-TGENV_AUTO_INSTALL=false terragrunt plan
-```
-
-##### `TGENV_DEBUG`
-
-Integer (Default: "")
-
-Set the debug level for TGENV.
-
-* unset/empty-string: No debug output
-* set: Bash execution tracing
+The path to a directory where the local terragrunt versions and configuration files exist.
 
 ## Upgrading
 ```bash
@@ -165,5 +151,5 @@ $ rm -rf /some/path/to/tgenv
 ```
 
 ## LICENSE
-- [tgenv itself](https://github.com/cunymatthieu/tgenv/blob/master/LICENSE)
-- [tfenv ](https://github.com/kamatama41/tgenv/blob/master/LICENSE) : tfenv mainly uses tfenv's source code
+- [tgenv itself](https://github.com/env0/tgenv/blob/master/LICENSE)
+- [tfenv ](https://github.com/kamatama41/tfenv/blob/master/LICENSE) : tgenv mainly uses tfenv's source code

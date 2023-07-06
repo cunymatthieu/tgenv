@@ -2,6 +2,7 @@
 
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
+source "${TGENV_ROOT}/libexec/retry"
 
 [ "${#}" -gt 1 ] && error_and_die "usage: tgenv install [<version>]"
 
@@ -9,7 +10,7 @@ declare version_requested version regex
 
 if [ -z "${1}" ]; then
   version_file="$(tgenv-version-file)"
-  if [ "${version_file}" != "${TGENV_ROOT}/version" ]; then
+  if [ "${version_file}" != "${TGENV_CONFIG_DIR}/version" ]; then
     version_requested="$(cat "${version_file}" || true)"
   fi
 else
@@ -28,10 +29,8 @@ else
 fi
 
 [ -n "${version}" ] || error_and_die "Version is not specified"
-version="$(tgenv-list-remote | grep -e "${regex}" | head -n 1)"
-[ -n "${version}" ] || error_and_die "No versions matching '${1}' found in remote"
 
-dst_path="${TGENV_ROOT}/versions/${version}"
+dst_path="${TGENV_CONFIG_DIR}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then
   echo "Terragrunt v${version} is already installed"
   exit 0
@@ -62,12 +61,43 @@ tarball_name="terragrunt_${os}";
 
 info "Installing Terragrunt v${version}"
 
+function install_tg_version() {
+  local http_code
+  http_code=$(curlw -# --location-trusted -w "%{http_code}" -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}")
+  local curl_exit_code=$?
+
+  local result_code
+  if [[ $http_code =~ ^4 ]]; then
+    error_log "Got $http_code http code, TG version is invalid"
+    result_code=2 # do not retry
+  elif [[ $http_code =~ ^5 ]]; then
+    error_log "Got $http_code http code"
+    result_code=1 # retry
+  elif [[ $curl_exit_code -ne 0 ]]; then
+    result_code=1 # retry
+  else
+    result_code=0 # success
+  fi
+
+  if [[ $result_code -ne 0 ]]; then
+    # make sure versions folder does not exist, so we can retry installation
+    rm -rf "${dst_path}"
+  fi
+
+  return $result_code
+}
+
+
 mkdir -p "${dst_path}" || error_and_die "Failed to make directory ${dst_path}"
 
 info "Downloading release tarball from ${version_url}/${tarball_name}"
-curlw -# --location-trusted -f -o "${dst_path}/terragrunt" "${version_url}/${tarball_name}" || error_and_die "Tarball download failed"
+retry -tries 5 -sleep 5 -stop-on-exit-code 2 install_tg_version || error_and_die "Tarball download failed"
+install_exist_code=$?
 
-chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
+if [ "$install_exist_code" -eq 0 ]; then
 
-info "Installation of terragrunt v${version} successful"
-tgenv-use "${version}"
+  chmod +x "${dst_path}/terragrunt" || error_and_die "Change rights failed"
+
+  info "Installation of terragrunt v${version} successful"
+  retry -sleep 3 tgenv-use "${version}" || error_and_die "tgenv use failed"
+fi

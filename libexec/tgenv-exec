@@ -15,27 +15,8 @@
 
 set -e
 [ -n "${TGENV_DEBUG}" ] && set -x
-source "${TGENV_ROOT}/libexec/helpers"
 
-info 'Getting version from tgenv-version-name';
-TGENV_VERSION="$(tgenv-version-name)" \
-  && info "TGENV_VERSION is ${TGENV_VERSION}" \
-  || {
-    # Errors will be logged from tgenv-version name,
-    # we don't need to trouble STDERR with repeat information here
-    error_and_die 'Failed to get version from tgenv-version-name';
-  };
-export TGENV_VERSION;
-
-if [ ! -d "${TGENV_ROOT}/versions/${TGENV_VERSION}" ]; then
-  if [ "${TGENV_AUTO_INSTALL:-false}" == "true" ]; then
-    info "version '${TGENV_VERSION}' is not installed (set by $(tgenv-version-file)). Installing now as TGENV_AUTO_INSTALL==true";
-    tgenv-install;
-  else
-    error_and_die "version '${TGENV_VERSION}' was requested, but not installed and TGENV_AUTO_INSTALL is not 'true'";
-  fi;
-fi;
-
-TG_BIN_PATH="${TGENV_ROOT}/versions/${TGENV_VERSION}/terragrunt"
+export TGENV_VERSION="$(tgenv-version-name)"
+TG_BIN_PATH="${TGENV_CONFIG_DIR}/versions/${TGENV_VERSION}/terragrunt"
 export PATH="${TG_BIN_PATH}:${PATH}"
 "${TG_BIN_PATH}" "${@}"

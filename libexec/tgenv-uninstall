@@ -9,7 +9,7 @@ declare version_requested version regex
 
 if [ -z "${1}" ]; then
   version_file="$(tgenv-version-file)"
-  if [ "${version_file}" != "${TGENV_ROOT}/version" ];then
+  if [ "${version_file}" != "${TGENV_CONFIG_DIR}/version" ];then
     version_requested="$(cat "${version_file}" || true)"
   fi
 else
@@ -31,7 +31,7 @@ fi
 version="$(tgenv-list | sed -E 's/^(\*| )? //g; s/ \(set by .+\)$//' | grep -e "${regex}" | head -n 1)"
 [ -n "${version}" ] || error_and_die "No versions matching '${1}' found in local"
 
-dst_path="${TGENV_ROOT}/versions/${version}"
+dst_path="${TGENV_CONFIG_DIR}/versions/${version}"
 if [ -f "${dst_path}/terragrunt" ]; then 
   info "Uninstall Terragrunt v${version}"
   rm -r "${dst_path}"

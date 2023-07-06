@@ -29,6 +29,13 @@ PATH="${TGENV_ROOT}/libexec:${PATH}"
 export PATH
 export TGENV_DIR="${PWD}"
 
+if [ -z "${TGENV_CONFIG_DIR:-""}" ]; then
+  TGENV_CONFIG_DIR="$TGENV_ROOT";
+else
+  TGENV_CONFIG_DIR="${TGENV_CONFIG_DIR%/}";
+fi
+export TGENV_CONFIG_DIR;
+
 abort() {
   { if [ "${#}" -eq 0 ]; then cat -
     else echo "tgenv: ${*}"

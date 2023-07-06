@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
-set -e
+link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
+
+# the  response header (--head) contains a link to the last page, contains the last page number and the "last" keyword to help identify
+page_curl=$(curl -s --tlsv1.2 --head "$link_release")
+last_page_phrase=$(echo "$page_curl" | grep -o -E "&page=[0-9]+>; rel=\"last")
+re="([0-9]+)"
+if [[ $last_page_phrase =~ $re ]] ; then
+  pages=${BASH_REMATCH[0]}
+else
+  pages=4 # default in case something changes in the way the responses are formatted
+fi
 
 [ -n "${TGENV_DEBUG}" ] && set -x
 source "${TGENV_ROOT}/libexec/helpers"
@@ -12,9 +22,15 @@ fi
 link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
 print=$(curl --tlsv1.2 -sf $link_release)
 
+for (( page=2; page <= pages; page++))
+do
+    link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000&page=${page}"
+    print+=$(curl --tlsv1.2 -sf $link_release)
+done
+
 return_code=$?
 if [ $return_code -eq 22 ];then
-  warn_and_continue "Failed to get list verion on $link_release"
+  warn_and_continue "Failed to get list version on $link_release"
   print=`cat ${TGENV_ROOT}/list_all_versions_offline`
 fi
 
