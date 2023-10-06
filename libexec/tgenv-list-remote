@@ -1,3 +1,24 @@
+# #!/usr/bin/env bash
+# set -e
+
+# [ -n "${TGENV_DEBUG}" ] && set -x
+# source "${TGENV_ROOT}/libexec/helpers"
+
+# if [ ${#} -ne 0 ];then
+#   echo "usage: tgenv list-remote" 1>&2
+#   exit 1
+# fi
+
+# link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
+# print=$(curl --tlsv1.2 -sf $link_release)
+
+# return_code=$?
+# if [ $return_code -eq 22 ];then
+#   warn_and_continue "Failed to get list verion on $link_release"
+#   print=`cat ${TGENV_ROOT}/list_all_versions_offline`
+# fi
+
+# echo $print | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
 #!/usr/bin/env bash
 set -e
 
@@ -9,13 +30,14 @@ if [ ${#} -ne 0 ];then
   exit 1
 fi
 
-link_release="https://api.github.com/repos/gruntwork-io/terragrunt/tags?per_page=1000"
+link_release="https://api.github.com/repos/gruntwork-io/terragrunt/git/matching-refs/tags"
 print=$(curl --tlsv1.2 -sf $link_release)
 
 return_code=$?
 if [ $return_code -eq 22 ];then
-  warn_and_continue "Failed to get list verion on $link_release"
+  warn_and_continue "Failed to get list version on $link_release"
   print=`cat ${TGENV_ROOT}/list_all_versions_offline`
 fi
 
-echo $print | grep -o -E "[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | uniq
+# Extract the tag from the "ref" field and remove the 'refs/tags/' prefix
+echo $print | grep -o -E "refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-(rc|beta)[0-9]+)?" | sed 's|refs/tags/||' | sed 's/^v//' | uniq
