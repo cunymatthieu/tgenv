@@ -14,7 +14,7 @@ Currently tgenv supports the following OSes
 1. Check out tgenv into any path (here is `${HOME}/.tgenv`)
 
   ```bash
-  $ git clone https://github.com/cunymatthieu/tgenv.git ~/.tgenv
+  $ git clone https://github.com/sabbari/tgenv.git ~/.tgenv
   ```
 
 2. Add `~/.tgenv/bin` to your `$PATH` any way you like
